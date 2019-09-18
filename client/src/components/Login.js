@@ -28,8 +28,8 @@ const Login = ({ history }) => {
       })
       .catch(err => {
         console.log(err.response);
-        err.response.status === 401
-        setError(err.response.data.message);
+        // err.response.status === 401
+        err.response.data.message && setError(err.response.data.message);
       });
   };
   return (
