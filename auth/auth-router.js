@@ -1,6 +1,27 @@
 const router = require('express').Router();
 const Users = require('../users/users-model.js');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const restrict = require('./restrict.js');
+
+function generateToken(user) {
+  const payload = {
+    username: user.username,
+    id: user.id,
+  };
+  const options = {
+    expiresIn: '1d',
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET || 'lkajsdlkjaskldj', options);
+}
+
+router.get('/refresh', restrict, (req, res) => {
+  Users.findByUsername(req.user.username)
+    .then(user => {
+      const token = generateToken(user);
+      res.status(200).json({ token });
+    });
+});
 
 router.post('/register', (req, res) => {
   const { username, password } = req.body;
@@ -20,8 +41,11 @@ router.post('/login', (req, res) => {
     .findByUsername(username)
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
-        req.session.user = user;
-        res.status(200).json({ message: "Yay! You logged in!!!!!!!" });
+        const token = generateToken(user);
+        res.status(200).json({
+          message: "Yay! You logged in!!!!!!!",
+          token
+        });
       } else {
         res.status(401).json({ message: "Invalid password" });
       }

@@ -5,7 +5,9 @@ const Users = (props) => {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     axios.get('http://localhost:8000/users', {
-      withCredentials: true
+      headers: {
+        Authorization: localStorage.getItem('token')
+      }
     })
       .then(res => {
         setUsers(res.data);

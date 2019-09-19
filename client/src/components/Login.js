@@ -18,12 +18,11 @@ const Login = ({ history }) => {
   const handleChange = e => setCreds({...creds, [e.target.name]: e.target.value });
   const handleSubmit = e => {
     e.preventDefault();
-    axios.post('http://localhost:8000/auth/login', creds, {
-      withCredentials: true
-    })
+    axios.post('http://localhost:8000/auth/login', creds)
       .then(res => {
         console.log(res);
         setCreds(initialCreds);
+        localStorage.setItem('token', res.data.token);
         history.push("/");
       })
       .catch(err => {
